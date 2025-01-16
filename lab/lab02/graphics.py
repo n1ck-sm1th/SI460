@@ -90,9 +90,9 @@ class Point3D:
     def __sub__(self, other):
         '''Subtract one point from another.'''
         if isinstance(other, Point3D):
+            return Vector3D(numpy.subtract(self.v, other.v))
+        elif isinstance(other, Vector3D): 
             return Point3D(numpy.subtract(self.v, other.v))
-        else: 
-            return Point3D(self.v - other)
     
     def __rsub__(self, other):
         if isinstance(other, Point3D):
@@ -169,7 +169,7 @@ if __name__ == '__main__':
     p1 = Point3D(1,1,1)
     p2 = Point3D(2,2,2)
     n = Normal(1,2,3)
-    c = u-v
+    c = p1-p2
     #print(n.__str__())
     print(str(c))
     #print(str(-n))
