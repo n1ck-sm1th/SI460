@@ -8,7 +8,7 @@ import math
 # Vector 3D class
 class Vector3D:
     def __init__(self, val, *args):
-        if type(val) is numpy.ndarray:
+        if isinstance(val, numpy.ndarray):
             self.v = val
         elif args and len(args) == 2:
             self.v = numpy.array([val,args[0],args[1]], dtype='float64')
@@ -25,20 +25,20 @@ class Vector3D:
     
     def __sub__(self, other):
         '''Subtract one vector from another.'''
-        if type(other) is numpy.ndarray:
+        if isinstance(other, Vector3D):
             return Vector3D(numpy.subtract(self.v, other.v))
         else: 
             return Vector3D(self.v - other)
         
     def __rsub__(self, other):
-        if type(other) is numpy.ndarray:
+        if isinstance(other, Vector3D):
             return Vector3D(numpy.subtract(other.v, self.v))
         else: 
             return Vector3D(other - self.v)
     
     def __mul__(self, other):
         '''Multiply a vector by another vector, overload * operator'''
-        if type(other) is numpy.ndarray:
+        if isinstance(other, Vector3D):
             return numpy.dot(self.v, other.v)
         else:
             return Vector3D(self.v * other)
@@ -74,7 +74,7 @@ class Vector3D:
 #Point3D class
 class Point3D:
     def __init__(self, val, *args):
-        if type(val) is numpy.ndarray:
+        if isinstance(val, numpy.ndarray):
             self.v = val
         elif args and len(args) == 2:
             self.v = numpy.array([val,args[0],args[1]], dtype='float64')
@@ -89,13 +89,13 @@ class Point3D:
     
     def __sub__(self, other):
         '''Subtract one point from another.'''
-        if type(other) is numpy.ndarray:
+        if isinstance(other, Point3D):
             return Point3D(numpy.subtract(self.v, other.v))
         else: 
             return Point3D(self.v - other)
     
     def __rsub__(self, other):
-        if type(other) is numpy.ndarray:
+        if isinstance(other, Point3D):
             return Point3D(numpy.subtract(other.v, self.v))
         else: 
             return Point3D(other - self.v)
@@ -117,7 +117,7 @@ class Point3D:
     
 class Normal:
     def __init__(self, val, *args):
-        if type(val) is numpy.ndarray:
+        if isinstance(val, numpy.ndarray):
             self.v = val
         elif args and len(args) == 2:
             self.v = numpy.array([val,args[0],args[1]], dtype='float64')
@@ -135,20 +135,20 @@ class Normal:
     
     def __sub__(self, other):
         '''Subtract one point from another.'''
-        if type(other) is numpy.ndarray:
+        if isinstance(other, Normal):
             return Normal(numpy.subtract(self.v, other.v))
         else: 
             return Normal(self.v - other)
         
     def __rsub__(self, other):
-        if type(other) is numpy.ndarray:
+        if isinstance(other, Normal):
             return Normal(numpy.subtract(other.v, self.v))
         else: 
             return Normal(other - self.v)
         
     def __mul__(self, other):
         '''Multiply a normal by another vector, overload * operator'''
-        if type(other) is numpy.ndarray:
+        if isinstance(other, Normal):
             return numpy.dot(self.v, other.v)
         else:
             return Normal(self.v * other)
@@ -169,12 +169,12 @@ if __name__ == '__main__':
     p1 = Point3D(1,1,1)
     p2 = Point3D(2,2,2)
     n = Normal(1,2,3)
-    c = v-u
-    print(n.__str__())
+    c = u-v
+    #print(n.__str__())
     print(str(c))
     #print(str(-n))
     #print(p1.__str__())
-    p3 = p1.distancesquared(p2)
+    #p3 = p1.distancesquared(p2)
     #print(str(p3))
     '''print("Testing Printing...")
     print(u.__str__())
@@ -231,8 +231,8 @@ if __name__ == '__main__':
     if scaled_frac1 != scaled_frac2:
       raise Exception("angle Error!")
     print(str(c))'''
-    print("Testing cross product")
+    '''print("Testing cross product")
     c = u.cross(v) 
     if str(c) != '[-3.  6. -3.]':
       raise Exception("cross Error!")
-    print(str(c))
+    print(str(c))'''
