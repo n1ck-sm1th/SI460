@@ -1,0 +1,13 @@
+#1: find dot product of a numpy vector with another vector
+cross product of 123 and 456
+
+#2: numpy distance between two points
+
+#3:distance between point 1 1 1 and 2 2 2
+
+#4: how to override subtraction python
+
+#5: why am I getting > [<graphics.Vector3D object at 0x7308f31446e0>
+ <graphics.Vector3D object at 0x7308f3abe600>
+ <graphics.Vector3D object at 0x7308f25f3ec0>]
+

@@ -57,7 +57,8 @@ class Vector3D:
         return numpy.linalg.norm(self.v)
     
     def copy(self):
-        return Vector3D(self.v)
+        v = Vector3D(self.v)
+        return v
     
     def square(self):
         '''Square the vector'''
@@ -117,7 +118,8 @@ class Point3D:
     
     def copy(self):
         '''Makes a copy of a point.'''
-        return Point3D(self.v)
+        p = Point3D(self.v)
+        return p
     
 class Normal:
     def __init__(self, val, *args):
@@ -154,7 +156,93 @@ class Normal:
         return numpy.dot(self.v, other.v)
     
  
+class Ray:
+    def __init__(self, origin, direction, *args):
+        if isinstance(origin, Point3D) :
+            self.origin = origin
+        else:
+            raise Exception("Invalid Arguments to Ray")
+        if isinstance(direction, Vector3D) :
+            self.direction = direction
+        else:
+            raise Exception("Invalid Arguments to Ray")
+   
+    def copy(self): 
+        '''Used to copy a Ray object'''
+        r = Ray(self.origin, self.direction)
+        return r
+            
+    def __repr__(self):
+        '''Used to print Ray object in format [1,1,1,] [2,2,2]
+        in order of origin and ray direction respectively'''
+        return "[" + str(self.origin) + ", " + str(self.direction)+"]"
     
+class ColorRGB: 
+    def __init__(self, val, *args):
+        if isinstance(val, numpy.ndarray):
+            self.v = val
+        elif args and len(args) == 2:
+            self.v = numpy.array([val,args[0],args[1]], dtype='float64')
+        else:
+            raise Exception("Invalid Arguments to ColorRGB")
+
+    def copy(self):
+        '''Makes a copy of a ColorRGB object.'''
+        r = ColorRGB(self.v)
+        return r
+      
+    def __repr__(self):
+        '''Used to print ColorRGB object in format [1. 1. 1.]'''
+        return str(self.v)
+    
+    def get(self):
+        '''Used to return the individual RGB values back to functions.'''
+        return self.v
+      
+    def __add__(self, other):
+        '''Add 2 RGB objects'''
+        return ColorRGB(self.v + other.v)   
+        
+    def __mul__(self, other):
+        '''Multiply ColorRGB by float or another ColorRGB'''
+        if isinstance(other, ColorRGB):
+            return ColorRGB(self.v * other.v)
+        if isinstance(other, float):
+            return ColorRGB(self.v * other)
+    
+    def __truediv__(self, other):
+        '''Divide a ColorRGB by a float'''
+        if isinstance(other, float):
+            return ColorRGB(self.v / other)
+
+    def __pow__(self, other):
+        '''Raise the individual color values to the value of the float.'''
+        return ColorRGB(self.v**other)
+    
+class Plane:
+    def __init__(self, point, normal, color=ColorRGB(1,1,1), *args):
+        if isinstance(point, Point3D) :
+            self.point = point
+        else:
+            raise Exception("Invalid Arguments to Plane")
+        if isinstance(normal, Normal) :
+            self.normal = normal
+        else:
+            raise Exception("Invalid Arguments to Plane")       
+        if isinstance(color, ColorRGB) :
+            self.color = color
+        else:
+            raise Exception("Invalid Arguments to Plane")   
+          
+    def copy(self):
+        '''Makes a copy of a Plane object.'''
+        p = Plane(self.point, self.normal, self.color)
+        return p
+    
+    def __repr__(self):
+        '''Used to print Plane object in format [1,1,1,] [2,2,2]
+        in order of point and normal respectively'''
+        return "[" + str(self.point) + ", " + str(self.normal)+"]"
     
 # We should always have debugging in our libraries
 # that run if the file is called from the command line
@@ -167,7 +255,10 @@ if __name__ == '__main__':
     n = Normal(1,2,3)
     c = p1-p2
     #print(n.__str__())
-    print(str(c))
+    #print(str(c))
+    #r = Ray(p1, u)
+    #print(r)
+    #r.__repr__()
     #print(str(-n))
     #print(p1.__str__())
     #p3 = p1.distancesquared(p2)
