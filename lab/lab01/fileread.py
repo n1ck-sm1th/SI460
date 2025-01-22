@@ -3,13 +3,13 @@
 import sys
 import re
 
-def ret(word):
+def ret(word): #Gen AI #1
   return word[20:]
 
 def rot(numb):
   return int(numb[:20])
   
-with open(sys.argv[1], 'r') as fileObject:
+with open(sys.argv[1], 'r') as fileObject: 
   census_list = []
   fileData = fileObject.readlines()
   for line in fileData:
@@ -21,7 +21,7 @@ with open(sys.argv[1], 'r') as fileObject:
         numbers = ""  # No numbers found
         rest = line[213:300]   
     census_list.append(numbers.ljust(20) + rest)
-  census_list.sort(key=rot)
+  census_list.sort(key=rot) #Gen AI 1,2,3
   census_list.sort(key=ret)
   for x in census_list:
     print(x)

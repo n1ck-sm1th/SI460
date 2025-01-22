@@ -1,0 +1,6 @@
+#1 Read a string and only take out the first numbers in the string, save it as one part of an array, then read the rest of the string and save the other part
+
+#2 Place things into an array list in python, I need to be able to sort this list
+
+#3 I need to sort a list of strings based on the name, not the number within it for instance 27599431 State House Districts not defined (Baltimore city)
+sort a list of strings based on the letters not numbers within it
