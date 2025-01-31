@@ -61,7 +61,7 @@ class Vector3D:
         return v
     
     def square(self):
-        '''Square the vector'''
+        '''Square the magnitude'''
         return (numpy.linalg.norm(self.v))**2
     
     def dotangle(self, other, angle):
@@ -84,6 +84,7 @@ class Point3D:
             raise Exception("Invalid Arguments to Point3D")
     
     def __str__(self):
+        print(numpy.array2string(self.v))
         return str(self.v)
     
     def __add__(self, other):
@@ -155,6 +156,14 @@ class Normal:
         '''Find the dot product of two vectors'''
         return numpy.dot(self.v, other.v)
     
+    def magnitude(self) :
+        '''Return the magnitude of normal'''
+        return numpy.linalg.norm(self.v)
+    
+    def __truediv__(self, other):
+        '''Divide a Normal by a float'''
+        return Normal(self.v / other)
+    
  
 class Ray:
     def __init__(self, origin, direction, *args):
@@ -197,7 +206,8 @@ class ColorRGB:
     
     def get(self):
         '''Used to return the individual RGB values back to functions.'''
-        return self.v
+        red, green, blue = self.v[0], self.v[1], self.v[2]
+        return red, green, blue
       
     def __add__(self, other):
         '''Add 2 RGB objects'''
@@ -207,13 +217,12 @@ class ColorRGB:
         '''Multiply ColorRGB by float or another ColorRGB'''
         if isinstance(other, ColorRGB):
             return ColorRGB(self.v * other.v)
-        if isinstance(other, float):
+        else:
             return ColorRGB(self.v * other)
     
     def __truediv__(self, other):
         '''Divide a ColorRGB by a float'''
-        if isinstance(other, float):
-            return ColorRGB(self.v / other)
+        return ColorRGB(self.v / other)
 
     def __pow__(self, other):
         '''Raise the individual color values to the value of the float.'''
@@ -244,82 +253,152 @@ class Plane:
         in order of point and normal respectively'''
         return "[" + str(self.point) + ", " + str(self.normal)+"]"
     
-# We should always have debugging in our libraries
-# that run if the file is called from the command line
-# vice from an import statement!
-if __name__ == '__main__':
-    u = Vector3D(1,2,3)
-    v = Vector3D(4,5,6)
-    p1 = Point3D(1,1,1)
-    p2 = Point3D(2,2,2)
-    n = Normal(1,2,3)
-    c = p1-p2
-    #print(n.__str__())
-    #print(str(c))
-    #r = Ray(p1, u)
-    #print(r)
-    #r.__repr__()
-    #print(str(-n))
-    #print(p1.__str__())
-    #p3 = p1.distancesquared(p2)
-    #print(str(p3))
-    '''print("Testing Printing...")
-    print(u.__str__())
-    print(v.__str__())
+    def hit(self, ray, epsilon, shadeRec=False):
+        '''Used to find a hit point between the Ray and the Plane'''
+        '''Note that epsilon is an extremely small number, 10^-6'''
+        rayParameter = ((self.point - ray.origin)).dot(self.normal)/ray.direction.dot(self.normal)
+        
+        #Check if hit point will be valid. If t >= 0 valid.
+        pointFound = False
+        if(rayParameter >= 0):
+           pointFound = True
+           
+        #Calculate hit point.
+        hitPoint = ray.origin + ray.direction*rayParameter
+        colorPlane = self.color
+        return pointFound, rayParameter, hitPoint, colorPlane
+    
+class Sphere:
+    def __init__(self, center, radius, color=ColorRGB(1,1,1), *args):
+        if isinstance(center, Point3D) :
+            self.center = center
+        else:
+            raise Exception("Invalid Arguments to Sphere")
+        if isinstance(radius, float) :
+            self.radius = radius
+        else:
+            raise Exception("Invalid Arguments to Sphere")       
+        if isinstance(color, ColorRGB) :
+            self.color = color
+        else:
+            raise Exception("Invalid Arguments to Sphere")  
+        
+    def copy(self):
+        '''Makes a copy of a Sphere object.'''
+        p = Sphere(self.center, self.radius, self.color)
+        return p
+    
+    def __repr__(self):
+        '''Used to print Sphere object in format [[1,1,1,], 10.0]
+        in order of point and radius respectively'''
+        return "[" + self.center + ", " + (self.radius)+"]"
+    
+    def hit(self, ray, epsilon, shadeRec=False):
+        '''Used to find a hit point between the Ray and the Plane'''
+        '''Note that epsilon is an extremely small number, 10^-6'''
+        a = ray.direction.dot(ray.direction)
+        b = ((ray.origin-self.center)*2).dot(ray.direction)
+        c = (ray.origin - self.center).dot(ray.origin-self.center) - (self.radius**2)
+        d = (b*b)-(a*c*4)
+        
+        #Check if hit point will be valid. If d < 0 invalid.
+        pointFound = False
+        if(d>=0) :
+            pointFound = True
+        rayParameter = (-b - numpy.sqrt(d))/(2*(a))
+           
+        #Calculate hit point.
+        hitPoint = ray.origin + ray.direction*rayParameter
+        colorPlane = self.color
+        return pointFound, rayParameter, hitPoint, colorPlane
+       
+class ViewPlane:
+    def __init__(self, center, normal, hres, vres, pixelSize, *args):
+        if isinstance(center, Point3D) :
+            self.center = center
+        else:
+            raise Exception("Invalid Arguments to ViewPlane")
+        if isinstance(normal, Normal) :
+            self.normal = normal
+        else:
+            raise Exception("Invalid Arguments to ViewPlane")       
+        self.hres = hres
+        self.vres = vres 
+        self.pixelSize = pixelSize 
+        
+        #Create the 2D hres and vres array, fill with 0s. 
+        self.vp = [] #GenAI usage #1
+        for _ in range(vres):  # Rows (vertical)
+            row = []
+            for _ in range(hres):  # Columns (horizontal)
+                row.append(ColorRGB(0,0,0))  # Default black: 0, 0, 0
+            self.vp.append(row)
 
-    if str(u) != '[1. 2. 3.]':
-        raise Exception("Printing Error!")
-    print("Testing Addition...")
-    c = u + v
-    print(c)
-    if str(c) != '[5. 7. 9.]':
-        raise Exception("Addition Error!")
-    print("Testing subtraction")
-    c = u - v 
-    if str(c) != '[-3. -3. -3.]':
-        raise Exception("Sub Error!")
-    print(str(c))
-    print("Testing multiplication")
-    c = u*2 
-    if str(c) != '[2. 4. 6.]':
-        raise Exception("mult Error!")
-    print(str(c))'''
-    '''print("Testing division")
-    c = u/2
-    if str(c) != '[0.5. 1.  1.5.]':
-        raise Exception("div Error!")
-    print(str(c))
-    print("Testing magnitude")
-    c = u.magnitude()
-    scaled_frac1 = int(c * 10**10)
-    scaled_frac2 = int(math.sqrt(14) * 10**10)
-    if scaled_frac1 != scaled_frac2:
-        raise Exception("mag Error!")
-    print(str(c))
-    print("Testing square")
-    c = u.square()
-    if c != 14:
-        raise Exception("sqaure Error!")
-    print(str(c))
-    print("Testing dot product")
-    c = u.dot(v)
-    if c != 32:
-      raise Exception("dot Error!")
-    print(str(c))
-    print("Testing dot product")
-    c = u * v 
-    if c != 32:
-      raise Exception("dot Error!")
-    print(str(c))
-    print("Testing dot angle")
-    c = u.dotangle(v, 0) 
-    scaled_frac1 = int(c * 10**10)
-    scaled_frac2 = int(32.83291031876401 * 10**10)
-    if scaled_frac1 != scaled_frac2:
-      raise Exception("angle Error!")
-    print(str(c))'''
-    '''print("Testing cross product")
-    c = u.cross(v) 
-    if str(c) != '[-3.  6. -3.]':
-      raise Exception("cross Error!")
-    print(str(c))'''
+    def get_color(self, row, col) :
+        '''Retrieve the ColorRGB object located at position (x, y).'''
+        return self.vp[row, col]
+        
+        
+    def set_color(self, row, col, ColorRGB) : 
+        '''Set a specific pixel's value to the ColorRGB object. '''
+        self.vp[row,col] = ColorRGB
+        
+    def get_point(self, row, col) :
+        '''Return a Point3D object that is located at the center
+        of the specific pixel.'''
+        n = self.normal
+        u = Vector3D(0,-1,0).cross(-n)/ Vector3D(0,-1,0).cross(-n).magnitude()
+        v = u.cross(-n)
+        c = self.center
+        LL = c - u * self.hres/2.0 * self.pixelSize - v * self.vres/2.0 * self.pixelSize
+        p = LL + u * col * self.pixelSize + v * row * self.pixelSize
+        return p
+        
+    def get_resolution(self) : 
+        '''Retrieve the horizontal and vertical values for the 
+        size of the viewing plane, this should return both 
+        numbers back individually.'''
+        return self.hres, self.vres
+        
+    def orthographic_ray(self, row, col) :
+        '''Find the point at the center of a specific pixel 
+        in the viewing plane. This can be considered the 
+        ray's origin for the purposes of drawing our scene
+        , use this point and the ViewPlane's normal to build 
+        and return a Ray Object.'''
+        
+
+class PPM:
+    def __init__(self, ViewPlaneObject, filename, *args):
+        if isinstance(ViewPlaneObject, ViewPlane) :
+            self.ViewPlaneObject = ViewPlaneObject
+        else:
+            raise Exception("Invalid Arguments to PPM")
+        if isinstance(filename, str) :
+            self.filename = filename
+        else:
+            raise Exception("Invalid Arguments to PPM")       
+        
+    
+        
+         
+#Library Debugging
+if __name__ == '__main__':
+    u = Vector3D(2,2,4)
+    v = Vector3D(4,5,6)
+    p1 = Point3D(1,1,-10)
+    p2 = Point3D(2,4,2)
+    n = Normal(-3,-3,-2)
+    c = p1-p2
+    col = ColorRGB(1,0,1)
+    ray = Ray(p1, u)
+    plane = Plane(p2, n)
+    #print(p1)
+    hit = Sphere(Point3D(0,0,0), 10.0).hit(Ray(Point3D(2,2,-20), Vector3D(0,0,1)), 0.000001)
+    #print(hit)
+    view = ViewPlane(Point3D(0,0,0), Normal(1,1,-1), 640, 480, 1)
+    p = view.get_point(250, 100)
+    print(p)
+    '''vp = ViewPlane(Point3D(0,0,0), Normal(0,0,1), 640, 480, 1.0)
+    print(str(['debug 1',0,0,vp.get_point(0,0)]))
+    print(str(['debug 2',479,639,vp.get_point(479,639)]))'''
