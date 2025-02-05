@@ -84,7 +84,6 @@ class Point3D:
             raise Exception("Invalid Arguments to Point3D")
     
     def __str__(self):
-        print(numpy.array2string(self.v))
         return str(self.v)
     
     def __add__(self, other):
@@ -172,6 +171,8 @@ class Ray:
         else:
             raise Exception("Invalid Arguments to Ray")
         if isinstance(direction, Vector3D) :
+            self.direction = direction
+        elif isinstance(direction, Normal):
             self.direction = direction
         else:
             raise Exception("Invalid Arguments to Ray")
@@ -268,6 +269,7 @@ class Plane:
         colorPlane = self.color
         return pointFound, rayParameter, hitPoint, colorPlane
     
+    
 class Sphere:
     def __init__(self, center, radius, color=ColorRGB(1,1,1), *args):
         if isinstance(center, Point3D) :
@@ -275,6 +277,8 @@ class Sphere:
         else:
             raise Exception("Invalid Arguments to Sphere")
         if isinstance(radius, float) :
+            self.radius = radius
+        elif isinstance(radius, int):
             self.radius = radius
         else:
             raise Exception("Invalid Arguments to Sphere")       
@@ -305,12 +309,18 @@ class Sphere:
         pointFound = False
         if(d>=0) :
             pointFound = True
-        rayParameter = (-b - numpy.sqrt(d))/(2*(a))
-           
+            rayParameter = (-b - numpy.sqrt(d))/(2*(a))
+            hitPoint = ray.origin + ray.direction*rayParameter
+            colorPlane = self.color
+            return pointFound, rayParameter, hitPoint, colorPlane
+        else:
+            rayParameter = (b - numpy.sqrt(-d))/(2*(a))
+            hitPoint = ray.origin + ray.direction*rayParameter
+            colorPlane = self.color
+            return pointFound, rayParameter, hitPoint, colorPlane
+
         #Calculate hit point.
-        hitPoint = ray.origin + ray.direction*rayParameter
-        colorPlane = self.color
-        return pointFound, rayParameter, hitPoint, colorPlane
+        
        
 class ViewPlane:
     def __init__(self, center, normal, hres, vres, pixelSize, *args):
@@ -333,25 +343,27 @@ class ViewPlane:
             for _ in range(hres):  # Columns (horizontal)
                 row.append(ColorRGB(0,0,0))  # Default black: 0, 0, 0
             self.vp.append(row)
-
+        
+        #Find lower left.
+        n = self.normal
+        self.u = Vector3D(0,-1,0).cross(-n)/ Vector3D(0,-1,0).cross(-n).magnitude()
+        self.v = self.u.cross(-n)
+        c = self.center
+        self.LL = c - self.u * self.hres/2.0 * self.pixelSize - self.v * self.vres/2.0 * self.pixelSize
+        
     def get_color(self, row, col) :
         '''Retrieve the ColorRGB object located at position (x, y).'''
-        return self.vp[row, col]
+        return self.vp[row][col]
         
         
     def set_color(self, row, col, ColorRGB) : 
         '''Set a specific pixel's value to the ColorRGB object. '''
-        self.vp[row,col] = ColorRGB
+        self.vp[row][col] = ColorRGB
         
     def get_point(self, row, col) :
         '''Return a Point3D object that is located at the center
         of the specific pixel.'''
-        n = self.normal
-        u = Vector3D(0,-1,0).cross(-n)/ Vector3D(0,-1,0).cross(-n).magnitude()
-        v = u.cross(-n)
-        c = self.center
-        LL = c - u * self.hres/2.0 * self.pixelSize - v * self.vres/2.0 * self.pixelSize
-        p = LL + u * col * self.pixelSize + v * row * self.pixelSize
+        p = self.LL + self.u * (col+0.5) * self.pixelSize + self.v * (row+0.5) * self.pixelSize
         return p
         
     def get_resolution(self) : 
@@ -366,6 +378,8 @@ class ViewPlane:
         ray's origin for the purposes of drawing our scene
         , use this point and the ViewPlane's normal to build 
         and return a Ray Object.'''
+        p = self.get_point(row, col)
+        return Ray(p, self.normal)
         
 
 class PPM:
@@ -378,7 +392,21 @@ class PPM:
             self.filename = filename
         else:
             raise Exception("Invalid Arguments to PPM")       
+        self.hres, self.vres = self.ViewPlaneObject.get_resolution()
+        #print(self.hres)
+        #print(self.vres)
         
+        with open(filename, "w") as f: #GenAI 2
+            f.write("P3\n")  # PPM magic number
+            f.write(f"{self.hres} {self.vres}\n")  # Image dimensions
+            f.write(f"{255}\n")  # Maximum color value
+            
+            for y in reversed(range(self.vres)):
+                for x in range(self.hres):
+                    red, green, blue = self.ViewPlaneObject.get_color(y, x).get()
+                    f.write(f"{int(red*255)} {int(green*255)} {int(blue*255)} ")  # RGB values (red, green, blue)
+                f.write("\n")
+
     
         
          
@@ -399,6 +427,10 @@ if __name__ == '__main__':
     view = ViewPlane(Point3D(0,0,0), Normal(1,1,-1), 640, 480, 1)
     p = view.get_point(250, 100)
     print(p)
+    r= view.orthographic_ray(250,100)
+    print(r)
+    view.get_color(250,100)
+    PPM(view,'part3-testing.ppm')
     '''vp = ViewPlane(Point3D(0,0,0), Normal(0,0,1), 640, 480, 1.0)
     print(str(['debug 1',0,0,vp.get_point(0,0)]))
     print(str(['debug 2',479,639,vp.get_point(479,639)]))'''

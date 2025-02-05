@@ -1,0 +1,3 @@
+1. Create a hres x vres python array (not a numpy array) during the object construction, with all values initialized as zeroed ColorRGB (or a black color) objects.
+
+2.Create a python function to read and write in ppm files. 
