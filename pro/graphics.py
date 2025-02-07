@@ -257,11 +257,12 @@ class Plane:
     def hit(self, ray, epsilon, shadeRec=False):
         '''Used to find a hit point between the Ray and the Plane'''
         '''Note that epsilon is an extremely small number, 10^-6'''
+
         rayParameter = ((self.point - ray.origin)).dot(self.normal)/ray.direction.dot(self.normal)
         
         #Check if hit point will be valid. If t >= 0 valid.
         pointFound = False
-        if(rayParameter >= 0):
+        if(rayParameter > 0):
            pointFound = True
            
         #Calculate hit point.
@@ -381,20 +382,20 @@ class ViewPlane:
         p = self.get_point(row, col)
         return Ray(p, self.normal)
         
+    def perspective_ray(self, row, col, origin): 
+        '''Find the position of the center of a pixel, use this 
+        and the position of the Camera (the Ray object) to determine 
+        the appropriate direction for the new perspective based ray 
+        that will be used to draw the scene.'''
+        p = self.get_point(row, col) #Get center of pixel
+        dir = (p - origin)
+        return Ray(p, dir) 
 
 class PPM:
     def __init__(self, ViewPlaneObject, filename, *args):
-        if isinstance(ViewPlaneObject, ViewPlane) :
-            self.ViewPlaneObject = ViewPlaneObject
-        else:
-            raise Exception("Invalid Arguments to PPM")
-        if isinstance(filename, str) :
-            self.filename = filename
-        else:
-            raise Exception("Invalid Arguments to PPM")       
+        self.ViewPlaneObject = ViewPlaneObject
+        self.filename = filename   
         self.hres, self.vres = self.ViewPlaneObject.get_resolution()
-        #print(self.hres)
-        #print(self.vres)
         
         with open(filename, "w") as f: #GenAI 2
             f.write("P3\n")  # PPM magic number
