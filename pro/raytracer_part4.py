@@ -3,6 +3,7 @@
 
 from numpy import Infinity
 from graphics import *
+from ppm import PPM
 
 class Raytracer:
     def __init__(self, vp, obs):
@@ -25,12 +26,12 @@ class Raytracer:
      
 
     def pRaytrace(self, vp, obs, ray):
-            for y in range(vp.vres):
-                for x in range(vp.hres):
-                    oRay = vp.perspective_ray(y, x, ray.origin)
-        
+        for y in range(vp.vres):
+            for x in range(vp.hres):
+                oRay = vp.perspective_ray(y, x, ray.origin)
+    
                 closest_t = float('inf') 
-              
+            
                 for object in obs: #Check each object.
                     pointFound, t, point, color = object.hit(oRay, 10**-6)
                     

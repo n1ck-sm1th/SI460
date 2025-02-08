@@ -1,6 +1,7 @@
 from numpy import Infinity
 from graphics import *
 from raytracer_part4 import Raytracer
+from ppm import PPM
 
 # Build the Spheres that will be in our world
 S1 = Sphere(Point3D(300,200,200), 100, ColorRGB(1.0,0.2,0.4))

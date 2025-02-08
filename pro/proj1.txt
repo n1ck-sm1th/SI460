@@ -1,3 +1,11 @@
 1. Create a hres x vres python array (not a numpy array) during the object construction, with all values initialized as zeroed ColorRGB (or a black color) objects.
 
 2.Create a python function to read and write in ppm files. 
+
+3.  Create a ray that originates from the center point of a row/column on the viewing-plane (.orthographic_ray)
+    Intersect that ray with every object in the world by finding the hit point between the ray and object (.hit)
+    Keep track of:
+        Minimum t value
+        The particular object with the minimum t value, and that object's color
+    Set the color on the viewing plane for that row/column to the color that was found
+    //Required significant editing on my part, but the general structure of the code is GenAI. 

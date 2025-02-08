@@ -391,23 +391,6 @@ class ViewPlane:
         dir = (p - origin)
         return Ray(p, dir) 
 
-class PPM:
-    def __init__(self, ViewPlaneObject, filename, *args):
-        self.ViewPlaneObject = ViewPlaneObject
-        self.filename = filename   
-        self.hres, self.vres = self.ViewPlaneObject.get_resolution()
-        
-        with open(filename, "w") as f: #GenAI 2
-            f.write("P3\n")  # PPM magic number
-            f.write(f"{self.hres} {self.vres}\n")  # Image dimensions
-            f.write(f"{255}\n")  # Maximum color value
-            
-            for y in reversed(range(self.vres)):
-                for x in range(self.hres):
-                    red, green, blue = self.ViewPlaneObject.get_color(y, x).get()
-                    f.write(f"{int(red*255)} {int(green*255)} {int(blue*255)} ")  # RGB values (red, green, blue)
-                f.write("\n")
-
     
         
          
@@ -418,20 +401,3 @@ if __name__ == '__main__':
     p1 = Point3D(1,1,-10)
     p2 = Point3D(2,4,2)
     n = Normal(-3,-3,-2)
-    c = p1-p2
-    col = ColorRGB(1,0,1)
-    ray = Ray(p1, u)
-    plane = Plane(p2, n)
-    #print(p1)
-    hit = Sphere(Point3D(0,0,0), 10.0).hit(Ray(Point3D(2,2,-20), Vector3D(0,0,1)), 0.000001)
-    #print(hit)
-    view = ViewPlane(Point3D(0,0,0), Normal(1,1,-1), 640, 480, 1)
-    p = view.get_point(250, 100)
-    print(p)
-    r= view.orthographic_ray(250,100)
-    print(r)
-    view.get_color(250,100)
-    PPM(view,'part3-testing.ppm')
-    '''vp = ViewPlane(Point3D(0,0,0), Normal(0,0,1), 640, 480, 1.0)
-    print(str(['debug 1',0,0,vp.get_point(0,0)]))
-    print(str(['debug 2',479,639,vp.get_point(479,639)]))'''
