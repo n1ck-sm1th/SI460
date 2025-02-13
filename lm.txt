@@ -1,3 +1,23 @@
 python3 -m venv ~/si460
 source ~/si460/bin/activate
 pip3 install PyOpenGL glfw pyglet==1.5.26 numpy
+function 460sync {
+  (
+    cd $HOME/SI460/SI460
+    git add .
+    if git diff-index --quiet --cached HEAD -- || git diff-files --quiet; then
+      echo "Committing current changes"
+      msg="working on $(basename "$(pwd)")"
+      echo git commit -a -m "msg"
+      git commit -a -m "msg"
+      echo
+    fi
+    echo
+    echo "Getting updates from your repo"
+    echo git pull
+    git pull 
+    echo
+    echo "Copying your work to your repo"
+    echo git push
+    git push
+  )
