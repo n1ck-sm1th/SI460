@@ -18,6 +18,24 @@ class Scene:
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
+        @self.window.event
+        def on_mouse_motion(x, y, dx, dy):
+            print(str(['motion', x, y, dx, dy]))
+
+        @self.window.event
+        def on_mouse_press(x, y, dx, dy):
+            print(str(['mouse', x, y]))
+
+        @self.window.event
+        def on_mouse_release(x, y, dx, dy):
+            print(str(['mouse', x, y]))
+        
+        ''' @self.window.event
+        def on_mourse_press(symbol, modifiers):
+            if symbol in pyglet.window.key._key_names:
+                symbol = pyglet.window.key._key_names[symbol]
+            print('THis is a test' + symbolS)'''
+
         # Resize our world based on the size of the window, in many cases
         # it's not in your best interest to allow resizing.
         @self.window.event
@@ -82,6 +100,6 @@ class Scene:
 # Run the following code if this script was run directly from the command line
 if __name__ == '__main__':
     myGame = Scene(600, 500, "Etch a Sketch", True)
-    debugging = pyglet.window.event.WindowEventLogger()
-    myGame.window.push_handlers(debugging)
+    #debugging = pyglet.window.event.WindowEventLogger()
+    #myGame.window.push_handlers(debugging)
     pyglet.app.run()
