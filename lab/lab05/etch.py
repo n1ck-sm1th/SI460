@@ -8,9 +8,18 @@ import numpy
 # Our OpenGL Graphical Environment!
 class Scene:
 
+    class eventStore:
+        event = []
+        i = 0
+        clickSwitch = False
+        
+        def store(self, x):
+            self.event.append(x)
+    
+    events = eventStore()
     # Initialize and run our environment
     def __init__(self, width=600, height=500, caption="Lab 5 - Etch-a-Sketch", resizable=False):
-
+        
         # Build the OpenGL / Pyglet Window
         self.window = pyglet.window.Window(width=width, height=height, resizable=resizable, caption=caption)
 
@@ -18,23 +27,30 @@ class Scene:
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
+        #Track the motion of the mouse.
         @self.window.event
         def on_mouse_motion(x, y, dx, dy):
             print(str(['motion', x, y, dx, dy]))
-
+        
+        #Track when the mouse is dragged and held. 
+        @self.window.event
+        def on_mouse_drag(x, y, dx, dy, button, mod):
+            print(str(['drag', x, y, dx, dy]))
+            if self.events.clickSwitch == True:
+                self.events.store(['drag', x, y])
+        
+        #Track when mosuse is pressed. 
         @self.window.event
         def on_mouse_press(x, y, dx, dy):
             print(str(['mouse', x, y]))
-
+            self.events.clickSwitch = True
+ 
+        #Track when mouse is released.
         @self.window.event
         def on_mouse_release(x, y, dx, dy):
-            print(str(['mouse', x, y]))
-        
-        ''' @self.window.event
-        def on_mourse_press(symbol, modifiers):
-            if symbol in pyglet.window.key._key_names:
-                symbol = pyglet.window.key._key_names[symbol]
-            print('THis is a test' + symbolS)'''
+            print(str(['release', x, y]))
+            self.events.store(['release', x, y])
+            self.events.clickSwitch = False
 
         # Resize our world based on the size of the window, in many cases
         # it's not in your best interest to allow resizing.
@@ -94,6 +110,12 @@ class Scene:
             x=300, y=470,
             anchor_x='center', anchor_y='center')
             label.draw()
+
+            glColor3f(1.0, 1.0, 1.0)
+            glBegin(GL_LINE_STRIP)
+            for i in self.events.event:
+                glVertex3f(i[1], i[2], 0.0)     
+            glEnd() 
 
            
 
