@@ -43,13 +43,14 @@ class Scene:
         @self.window.event
         def on_mouse_press(x, y, dx, dy):
             print(str(['mouse', x, y]))
+            #self.events.store(['mouse', x, y])
             self.events.clickSwitch = True
  
         #Track when mouse is released.
         @self.window.event
         def on_mouse_release(x, y, dx, dy):
             print(str(['release', x, y]))
-            self.events.store(['release', x, y])
+            #self.events.store(['release', x, y])
             self.events.clickSwitch = False
 
         # Resize our world based on the size of the window, in many cases
@@ -112,9 +113,9 @@ class Scene:
             label.draw()
 
             glColor3f(1.0, 1.0, 1.0)
-            glBegin(GL_LINE_STRIP)
+            glBegin(GL_LINES)
             for i in self.events.event:
-                glVertex3f(i[1], i[2], 0.0)     
+                glVertex3f(i[1], i[2], 0.0)   
             glEnd() 
 
            
