@@ -1,0 +1,7 @@
+#1 How do you check if a number is within a range in python. I have a box and I want
+to keep my drawings within it. 
+
+#2 How to add functionality where pressing a key will reset what I have within my drawing
+box.
+
+#3 How to wrtie information from a file to an array in python.

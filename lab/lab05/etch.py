@@ -4,21 +4,59 @@ import pyglet
 from pyglet.window import mouse, key
 from pyglet.gl import *
 import numpy
+import sys
 
 # Our OpenGL Graphical Environment!
 class Scene:
 
     class eventStore:
-        event = []
+        clickEvent = []
+        dragEvent = []
         i = 0
         clickSwitch = False
         
-        def store(self, x):
-            self.event.append(x)
+        def clickStore(self, x):
+            self.clickEvent.append(x)
+        
+        def dragStore(self, x):
+            self.dragEvent.append(x)
     
-    events = eventStore()
+    clickEvents = eventStore()
+    dragEvents = eventStore()
+    saveFile = ''
+    loadFile = ''
+    save = False
+
+
+    def keep(self): 
+        with open(self.saveFile, 'w') as f:
+            for i in self.dragEvents.dragEvent:
+                f.write(f"{i[0]} {i[1]} {i[2]}\n")
+            for i in self.clickEvents.clickEvent:
+                f.write(f"{i[0], i[1], i[2]}\n")
+
+    def load(self):
+        print(self.loadFile)
+        with open(self.loadFile, 'r') as f: #Gen AI #3
+            for line in f:
+                event_type, x, y = line.strip().split(' ')
+                print(event_type)
+                if event_type == 'drag':
+                    self.dragEvents.dragStore(['drag', float(x), float(y)])
+                elif event_type == 'click':
+                    self.clickEvents.clickStore(['click', float(x), float(y)])
+
+
     # Initialize and run our environment
     def __init__(self, width=600, height=500, caption="Lab 5 - Etch-a-Sketch", resizable=False):
+        
+        if len(sys.argv) > 1:
+            if sys.argv[1] == '-s': 
+                self.saveFile = sys.argv[2]
+                self.save = True
+            elif sys.argv[1] == '-l':
+                self.loadFile = sys.argv[2]
+                self.load()
         
         # Build the OpenGL / Pyglet Window
         self.window = pyglet.window.Window(width=width, height=height, resizable=resizable, caption=caption)
@@ -35,24 +73,35 @@ class Scene:
         #Track when the mouse is dragged and held. 
         @self.window.event
         def on_mouse_drag(x, y, dx, dy, button, mod):
+            if 100 <= x <= 500 and 100 <= y <= 450: 
+                self.dragEvents.dragStore(['drag', x, y])
             print(str(['drag', x, y, dx, dy]))
-            if self.events.clickSwitch == True:
-                self.events.store(['drag', x, y])
         
         #Track when mosuse is pressed. 
         @self.window.event
         def on_mouse_press(x, y, dx, dy):
             print(str(['mouse', x, y]))
-            #self.events.store(['mouse', x, y])
-            self.events.clickSwitch = True
+            if 100 <= x <= 500 and 100 <= y <= 450: 
+                self.clickEvents.clickStore(['mouse', x, y])
  
         #Track when mouse is released.
         @self.window.event
         def on_mouse_release(x, y, dx, dy):
             print(str(['release', x, y]))
-            #self.events.store(['release', x, y])
-            self.events.clickSwitch = False
+            if 100 <= x <= 500 and 100 <= y <= 450: #Gen AI 1
+                self.clickEvents.clickStore(['release', x, y])
 
+        @self.window.event
+        def on_key_press(symbol, modifiers): #Gen AI 2
+            if symbol == pyglet.window.key.C:
+                self.dragEvents.dragEvent = []
+                self.clickEvents.clickEvent = []
+            if symbol == pyglet.window.key.Q:
+                if self.save == True:
+                    self.keep()
+                sys.exit()
+
+        
         # Resize our world based on the size of the window, in many cases
         # it's not in your best interest to allow resizing.
         @self.window.event
@@ -114,15 +163,21 @@ class Scene:
 
             glColor3f(1.0, 1.0, 1.0)
             glBegin(GL_LINES)
-            for i in self.events.event:
+            for i in self.dragEvents.dragEvent:
+                glVertex3f(i[1], i[2], 0.0)
+            glEnd()
+
+            glColor3f(1.0, 1.0, 1.0)   
+            glBegin(GL_POINTS)
+            for i in self.clickEvents.clickEvent:
                 glVertex3f(i[1], i[2], 0.0)   
             glEnd() 
+
+         
 
            
 
 # Run the following code if this script was run directly from the command line
 if __name__ == '__main__':
     myGame = Scene(600, 500, "Etch a Sketch", True)
-    #debugging = pyglet.window.event.WindowEventLogger()
-    #myGame.window.push_handlers(debugging)
     pyglet.app.run()
