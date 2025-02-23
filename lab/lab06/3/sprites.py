@@ -18,15 +18,19 @@ def loadAllImages(filepath="mylevel/sprites"):
 def loadImages(filepath="mylevel/sprites/hero"):
     files = os.listdir(filepath)
     files.sort(key=natural_keys)
-    left = []
+    images = {} #Gen AI 1
     for file in files:
         line = file.split(' ')
-        print(line[0])
-        #left.append(file)
-        # process files by class (Attack, Climb, Dead, etc as you find them, don't hardcode this in)
-    for i in left:
-        print(i)
-    pass
+        action = line[0]
+        directionL = 'Left'
+        directionR = 'Right'
+    
+        if action not in images:
+            images[action] = {'Left': [], 'Right': []}
+
+        images[action][directionL].append(os.path.join(filepath, file))
+        images[action][directionR].append(os.path.join(filepath, file))
+    return images
 
 # Build and return a configured sprite
 def buildSprite(sprites={}, character="hero", mode="Run", facing="Right",
@@ -44,4 +48,10 @@ def atoi(text):
 # Run the following code if this script was run directly from the command line
 if __name__ == '__main__':
     loadTest = loadImages()
+    #Gen AI 2
+    for action, directions in loadTest.items():
+        print(f"'{action}': ")  # Print the action key
+        for direction, image_list in directions.items():
+            print(f"    '{direction}': {image_list},")  # Print the direction and image list
+        print("}")  # Close the action dictionary
     imagesTest = loadAllImages()
