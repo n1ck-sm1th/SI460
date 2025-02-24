@@ -9,7 +9,13 @@ import re
 #    {'hero': {'Run':{'Left':  [...array of images facing left...],
 #                     'Right': [...array of images facing right...]}}}
 def loadAllImages(filepath="mylevel/sprites"):
-    pass
+    dirs = os.listdir(filepath)
+    a =  loadImages()
+    allImages = {}
+    for obj in dirs:
+        if obj not in dirs:
+            allImages[obj].append(a)
+    return allImages
 
 # Function to load all images within a subdirectory
 # Returns a dictionary of the form:
@@ -47,11 +53,18 @@ def atoi(text):
 
 # Run the following code if this script was run directly from the command line
 if __name__ == '__main__':
-    loadTest = loadImages()
+    loadTest = loadAllImages()
     #Gen AI 2
-    for action, directions in loadTest.items():
+    '''for action, directions in loadTest.items():
         print(f"'{action}': ")  # Print the action key
         for direction, image_list in directions.items():
             print(f"    '{direction}': {image_list},")  # Print the direction and image list
-        print("}")  # Close the action dictionary
-    imagesTest = loadAllImages()
+        print("}")  # Close the action dictionary'''
+    for obj, action, directions in loadTest:
+        print(f"'{obj}': ")  # Print the action key
+        #for action, directions in loadTest.items():
+            #print(f"'{action}': ")  # Print the action key
+            #for direction, image_list in directions.items():
+                #print(f"    '{direction}': {image_list},")  # Print the direction and image list
+            #print("}")  # Close the action dictionary
+    #imagesTest = loadAllImages()
