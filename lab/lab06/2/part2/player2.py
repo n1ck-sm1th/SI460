@@ -1,4 +1,4 @@
-listdir#!/usr/bin/python3
+#!/usr/bin/python3
 
 # Important Libraries
 import pyglet

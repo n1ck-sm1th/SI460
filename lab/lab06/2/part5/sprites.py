@@ -72,11 +72,10 @@ if __name__ == '__main__':
     loadTest1 = loadImages()
     #Gen AI 2
     # Print in the desired format
-    #Part 3 Uncomment to print.
-    #print(json.dumps(loadTest1, indent=4))
-    #Part 4 Uncomment to print
+    #Part 4
     #print(json.dumps(loadTest, indent=4))
-    #Part 5
     playerSprite = buildSprite()
     playerSprite.draw()
-    
+    #Part 3
+    #print(json.dumps(loadTest1, indent=4))
+    #imagesTest = loadAllImages()
