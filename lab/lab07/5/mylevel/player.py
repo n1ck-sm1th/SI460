@@ -55,8 +55,33 @@ class Player:
 
     # Move the character
     def movement(self, t=0, keyTracking={}):
-        pass
+        modifiers = keyTracking.get("modifiers", 0)
+        #print(modifiers)
+        #If there are no buttons being pressed. 
+        if self.mode != 'Idle':
+            self.mode = 'Idle'
+            self.changeSprite()
         
+        #Right movement.
+        if pyglet.window.key.RIGHT in keyTracking:
+            if pyglet.window.key.MOD_SHIFT:
+                self.playerSprite.x += 9
+            else:
+                self.playerSprite.x += 3
+            self.mode = 'Run'
+            self.facing = 'Right'
+            self.changeSprite()
+            
+        #Left movement.
+        if pyglet.window.key.LEFT in keyTracking:
+            if pyglet.window.key.MOD_SHIFT:
+                self.playerSprite.x -= 9
+            else:
+                self.playerSprite.x -= 3
+            self.mode = 'Run'
+            self.facing = 'Left'
+            self.changeSprite()
+
     # Draw our character
     def draw(self, t=0, keyTracking={}, *other):
         self.movement(t, keyTracking)
