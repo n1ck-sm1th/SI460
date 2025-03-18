@@ -55,33 +55,40 @@ class Player:
 
     # Move the character
     def movement(self, t=0, keyTracking={}):
-        modifiers = keyTracking.get("modifiers", 0)
-        #print(modifiers)
-        #If there are no buttons being pressed. 
-        if self.mode != 'Idle':
-            self.mode = 'Idle'
-            self.changeSprite()
+        modifiers = False
+        if pyglet.window.key.LSHIFT in keyTracking or pyglet.window.key.RSHIFT in keyTracking:
+            modifiers = True
         
         #Right movement.
         if pyglet.window.key.RIGHT in keyTracking:
-            if pyglet.window.key.MOD_SHIFT:
+            if modifiers & pyglet.window.key.MOD_SHIFT: # Check if shift is held
                 self.playerSprite.x += 9
             else:
                 self.playerSprite.x += 3
-            self.mode = 'Run'
-            self.facing = 'Right'
-            self.changeSprite()
+            if self.mode != 'Run':
+                self.mode = 'Run'
+                if self.facing != 'Right':
+                    self.facing = 'Right'
+                self.changeSprite()
             
         #Left movement.
-        if pyglet.window.key.LEFT in keyTracking:
-            if pyglet.window.key.MOD_SHIFT:
+        elif pyglet.window.key.LEFT in keyTracking:
+            if modifiers & pyglet.window.key.MOD_SHIFT: # Check if shift is held
                 self.playerSprite.x -= 9
             else:
                 self.playerSprite.x -= 3
-            self.mode = 'Run'
-            self.facing = 'Left'
-            self.changeSprite()
+            if self.mode != 'Run':
+                self.mode = 'Run'
+                if self.facing != 'Left':
+                    self.facing = 'Left'
+                self.changeSprite()
 
+       
+            #If there are no buttons being pressed. 
+        elif self.mode != 'Idle':
+                self.mode = 'Idle'
+                self.changeSprite()
+        
     # Draw our character
     def draw(self, t=0, keyTracking={}, *other):
         self.movement(t, keyTracking)
